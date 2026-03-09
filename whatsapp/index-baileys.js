@@ -10,11 +10,12 @@ const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const authFolder = './baileys_auth';
-const qrFolder = './qrcodes';
+// Use absolute paths so QR/auth folders work reliably on Linux VM (regardless of cwd)
+const authFolder = path.join(__dirname, 'baileys_auth');
+const qrFolder = path.join(__dirname, 'qrcodes');
 
   fs.ensureDirSync(qrFolder);
-  fs.ensureDirSync('./receipts');
+  fs.ensureDirSync(path.join(__dirname, 'receipts'));
   fs.ensureDirSync(authFolder);
 
   let sock = null;
@@ -61,8 +62,11 @@ const qrFolder = './qrcodes';
         try {
           const dataUrl = await qrcode.toDataURL(qr);
           currentQr = dataUrl;
-          await qrcode.toFile(path.join(qrFolder, 'last_qr.png'), qr);
+          const qrFile = path.join(qrFolder, 'last_qr.png');
+          await qrcode.toFile(qrFile, qr);
+          console.log('✅ QR code saved to', qrFile);
         } catch (e) {
+          console.error('⚠️ Could not save QR to file:', e.message);
           currentQr = qr; // fallback to raw
         }
       }
@@ -281,7 +285,7 @@ const qrFolder = './qrcodes';
   // Web routes
   app.get('/qr', (req, res) => {
     try {
-      const qrPath = path.join(process.cwd(), qrFolder, 'last_qr.png');
+      const qrPath = path.join(qrFolder, 'last_qr.png');
       const qrExists = fs.existsSync(qrPath);
 
       let content = '';
@@ -314,7 +318,7 @@ const qrFolder = './qrcodes';
 
   app.get('/qr-image', (req, res) => {
     try {
-      const qrPath = path.join(process.cwd(), qrFolder, 'last_qr.png');
+      const qrPath = path.join(qrFolder, 'last_qr.png');
       if (fs.existsSync(qrPath)) {
         res.sendFile(qrPath);
       } else {

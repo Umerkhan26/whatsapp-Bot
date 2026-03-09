@@ -1,7 +1,7 @@
 module.exports = {
   apps: [{
     name: 'whatsapp-bot',
-    script: './index.js',
+    script: './index-baileys.js',
     cwd: '/var/www/whatsapp-bot',
     instances: 1,
     autorestart: true,

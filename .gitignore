@@ -1,0 +1,9 @@
+node_modules/
+.env
+__MACOSX/
+whatsapp/chrome/
+baileys_auth/
+tokens/
+qrcodes/
+receipts/
+*.log
